@@ -32,6 +32,17 @@ class SchemaDiff:
     def has_changes(self) -> bool:
         return len(self.table_diffs) > 0
 
+    @property
+    def summary(self) -> str:
+        """Return a short human-readable summary of the diff."""
+        added = sum(1 for t in self.table_diffs if t.change == "added")
+        removed = sum(1 for t in self.table_diffs if t.change == "removed")
+        modified = sum(1 for t in self.table_diffs if t.change == "modified")
+        return (
+            f"{self.source_name} -> {self.target_name}: "
+            f"{added} table(s) added, {removed} removed, {modified} modified"
+        )
+
 
 def _diff_columns(table_name: str, source: Table, target: Table) -> list[ColumnDiff]:
     diffs: list[ColumnDiff] = []
