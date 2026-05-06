@@ -52,6 +52,20 @@ def test_column_added():
     assert table_diff.column_diffs[0].change == "added"
 
 
+def test_column_removed():
+    col_id = Column(name="id", data_type="INTEGER")
+    col_email = Column(name="email", data_type="VARCHAR")
+    source = make_schema("v1", [Table(name="users", columns=[col_id, col_email])])
+    target = make_schema("v2", [Table(name="users", columns=[col_id])])
+    result = diff_schemas(source, target)
+    assert result.has_changes
+    table_diff = result.table_diffs[0]
+    assert table_diff.change == "modified"
+    assert len(table_diff.column_diffs) == 1
+    assert table_diff.column_diffs[0].column == "email"
+    assert table_diff.column_diffs[0].change == "removed"
+
+
 def test_column_type_modified():
     col_old = Column(name="age", data_type="INTEGER")
     col_new = Column(name="age", data_type="BIGINT")
