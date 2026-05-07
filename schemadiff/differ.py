@@ -43,6 +43,13 @@ class SchemaDiff:
             f"{added} table(s) added, {removed} removed, {modified} modified"
         )
 
+    def get_table_diff(self, table_name: str) -> Optional["TableDiff"]:
+        """Return the TableDiff for a specific table, or None if not found."""
+        for td in self.table_diffs:
+            if td.table == table_name:
+                return td
+        return None
+
 
 def _diff_columns(table_name: str, source: Table, target: Table) -> list[ColumnDiff]:
     diffs: list[ColumnDiff] = []
@@ -84,7 +91,8 @@ def diff_schemas(source: Schema, target: Schema) -> SchemaDiff:
     for t in sorted(removed_tables):
         result.table_diffs.append(TableDiff(table=t, change="removed"))
     for t in sorted(common_tables):
-        col_diffs = _diff_columns(t, source.get_table(t), target.get_table(t))
+        col_diffs = _diff_columns(t,
+            source.get_table(t), target.get_table(t))
         if col_diffs:
             result.table_diffs.append(TableDiff(table=t, change="modified", column_diffs=col_diffs))
 
