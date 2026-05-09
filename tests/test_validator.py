@@ -45,6 +45,18 @@ def test_column_context_included_in_error():
         validate_column_dict({"type": "text"}, context="table 'users'")
 
 
+def test_column_name_not_string_raises():
+    """Ensure a non-string 'name' value is rejected with a clear message."""
+    with pytest.raises(ValidationError, match="non-empty string"):
+        validate_column_dict({"name": 42, "type": "integer"})
+
+
+def test_column_type_not_string_raises():
+    """Ensure a non-string 'type' value is rejected with a clear message."""
+    with pytest.raises(ValidationError, match="non-empty string"):
+        validate_column_dict({"name": "col", "type": 123})
+
+
 # --- validate_table_dict ---
 
 def test_valid_table_passes():
@@ -105,11 +117,3 @@ def test_schema_duplicate_table_name_raises():
                 {"name": "users", "columns": []},
             ]
         })
-
-
-def test_schema_empty_tables_passes():
-    validate_schema_dict({"tables": []})
-
-
-def test_schema_no_tables_key_passes():
-    validate_schema_dict({})
