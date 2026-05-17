@@ -69,6 +69,12 @@ def test_load_from_string_invalid_json_raises():
         load_policy_from_string("{not valid json")
 
 
+def test_load_from_string_empty_string_raises():
+    """An empty string is not valid JSON and should raise PolicyError."""
+    with pytest.raises(PolicyError, match="Invalid JSON"):
+        load_policy_from_string("")
+
+
 def test_load_from_file_roundtrip(tmp_path):
     policy_file = tmp_path / "policy.json"
     policy_file.write_text(json.dumps(_SIMPLE_POLICY), encoding="utf-8")
@@ -79,6 +85,14 @@ def test_load_from_file_roundtrip(tmp_path):
 def test_load_from_file_missing_raises():
     with pytest.raises(PolicyError, match="not found"):
         load_policy_from_file("/nonexistent/path/policy.json")
+
+
+def test_load_from_file_invalid_json_raises(tmp_path):
+    """A file containing malformed JSON should raise PolicyError."""
+    policy_file = tmp_path / "bad_policy.json"
+    policy_file.write_text("{bad json", encoding="utf-8")
+    with pytest.raises(PolicyError, match="Invalid JSON"):
+        load_policy_from_file(str(policy_file))
 
 
 def test_load_from_dict_default_message():
